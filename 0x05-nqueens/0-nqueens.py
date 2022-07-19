@@ -1,44 +1,51 @@
 #!/usr/bin/python3
-"""Module N-queens"""
-import sys
+"""program that solves the N queens problem."""
+from sys import argv, exit
 
 
-def nqueens(n: int, y: int, board):
-    """
-    will do the backtracking
-    """
-    for x in range(n):
-        hold = 0
-        for q in board:
-            if x == q[1]:
-                hold = 1
-                break
-            if y - x == q[0] - q[1]:
-                hold = 1
-                break
-            if x - q[1] == q[0] - y:
-                hold = 1
-                break
-        if hold == 0:
-            board.append([y, x])
-            if y != n - 1:
-                nqueens(n, y + 1, board)
-            else:
-                print(board)
-            del board[-1]
+if len(argv) != 2:
+    print("Usage: nqueens N")
+    exit(1)
+
+N = argv[1]
+
+try:
+    N = int(N)
+except ValueError:
+    print("N must be a number")
+    exit(1)
+
+if N < 4:
+    print("N must be at least 4")
+    exit(1)
+
+solution = []
 
 
-if __name__ == "__main__":
-    if len(sys.argv) > 2 or len(sys.argv) < 2:
-        print("Usage: nqueens N")
-        exit(1)
+def nqueens(row, N, solution):
+    """The program should print any possible solution"""
+    if (row == N):
+        print(solution)
+    else:
+        for col in range(N):
+            position = [row, col]
+            if validposition(solution, position):
+                solution.append(position)
+                nqueens(row + 1, N, solution)
+                solution.remove(position)
 
-    if not sys.argv[1].isdigit():
-        print("N must be a number")
-        exit(1)
 
-    if int(sys.argv[1]) < 4:
-        print("N must be at least 4")
-        exit(1)
+def validposition(solution, position):
+    """validate horizontal and diagonal position of queens"""
+    for queen in solution:
+        if queen[1] == position[1]:
+            return False
+        # descending diagonal
+        if (queen[0] - queen[1]) == (position[0] - position[1]):
+            return False
+        # ascending diagonal
+        if (queen[0] + queen[1]) == (position[0] + position[1]):
+            return False
+    return True
 
-    nqueens(int(sys.argv[1]), 0, [])
+nqueens(0, N, solution)
